@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Patient Clinical Timeline — Nicholle822 Cori307 Herzog843</title>
+  <style>
+    :root {
+      --bg: #f5ede0;
+      --panel: #fffaf2;
+      --ink: #1b1b1b;
+      --muted: #6b6359;
+      --line: #e5d5c0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Avenir Next","Trebuchet MS",sans-serif; background: var(--bg); color: var(--ink); }
+
+    /* ── Header ── */
+    .hdr {
+      background: linear-gradient(135deg, #1b3a4b 0%, #0d7c66 100%);
+      color: #fff;
+      padding: 26px 32px 20px;
+    }
+    .hdr h1 { font-size: 26px; letter-spacing: 0.3px; }
+    .hdr .meta { margin-top: 6px; opacity: 0.8; font-size: 14px; }
+    .kpis { display: flex; gap: 14px; margin-top: 18px; flex-wrap: wrap; }
+    .kpi {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      padding: 8px 16px;
+      text-align: center;
+      min-width: 90px;
+    }
+    .kpi .kn { font-size: 22px; font-weight: 700; }
+    .kpi .kl { font-size: 11px; opacity: 0.75; text-transform: uppercase; margin-top: 2px; }
+
+    /* ── Filters ── */
+    .filters {
+      display: flex; gap: 8px; padding: 16px 24px; flex-wrap: wrap;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+    .fbtn {
+      border-radius: 20px;
+      border: 1.5px solid;
+      background: transparent;
+      padding: 5px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fbtn:hover, .fbtn.active { background: var(--ink); color: #fff !important; border-color: var(--ink) !important; }
+
+    /* ── Timeline ── */
+    .tl-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+      position: relative;
+    }
+    .tl-wrap::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--line);
+      transform: translateX(-50%);
+    }
+
+    .year-marker {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      margin: 22px 0 6px;
+    }
+    .year-marker span, .year-marker {
+      display: inline-block;
+      background: #1b3a4b;
+      color: #fff;
+      border-radius: 20px;
+      padding: 3px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .evt {
+      display: flex;
+      align-items: flex-start;
+      margin: 14px 0;
+      position: relative;
+      width: 50%;
+      opacity: 1;
+      transition: opacity 0.2s;
+    }
+    .evt.hidden { opacity: 0; max-height: 0; overflow: hidden; margin: 0; pointer-events: none; }
+
+    .evt-left {
+      padding-right: 36px;
+      flex-direction: row-reverse;
+      align-self: flex-start;
+    }
+    .evt-right {
+      padding-left: 36px;
+      margin-left: 50%;
+    }
+
+    .dot {
+      position: absolute;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      border: 3px solid var(--bg);
+      z-index: 3;
+      flex-shrink: 0;
+    }
+    .evt-left .dot  { right: -17px; }
+    .evt-right .dot { left: -17px; }
+
+    .card {
+      background: var(--panel);
+      border-radius: 12px;
+      border-left: 4px solid #999;
+      padding: 12px 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      flex: 1;
+      min-width: 0;
+    }
+    .evt-left .card { text-align: right; border-left: none !important; border-right: 4px solid #999; }
+    .evt-left .card { border-right-color: inherit; }
+    .card-type { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; margin-bottom: 4px; }
+    .card-label { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .card-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .card-detail { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .dur { background: #f0e8d8; border-radius: 8px; padding: 2px 7px; font-size: 11px; margin-left: 6px; }
+    .no-events { text-align: center; color: var(--muted); padding: 40px; font-size: 16px; display: none; }
+
+    @media (max-width: 680px) {
+      .tl-wrap::before { left: 20px; }
+      .evt { width: 100%; margin-left: 0 !important; padding-left: 54px !important; padding-right: 0 !important; flex-direction: row !important; }
+      .evt .dot { left: 3px !important; right: auto !important; }
+      .card { text-align: left !important; border-left: 4px solid !important; border-right: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hdr">
+    <h1>Patient Clinical Timeline</h1>
+    <div class="meta">Nicholle822 Cori307 Herzog843 &nbsp;·&nbsp; Female &nbsp;·&nbsp; DOB: 1981-05-10 &nbsp;·&nbsp; Boston, MA</div>
+    <div class="kpis">
+      <div class="kpi"><div class="kn">8</div><div class="kl">Encounters</div></div>
+      <div class="kpi"><div class="kn">0</div><div class="kl">Observations</div></div>
+      <div class="kpi"><div class="kn">0</div><div class="kl">Conditions</div></div>
+      <div class="kpi"><div class="kn">0</div><div class="kl">Medications</div></div>
+      <div class="kpi"><div class="kn">8</div><div class="kl">Total Events</div></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="fbtn" data-filter="all" style="border-color:#444;color:#444;">All</button><button class="fbtn" data-filter="encounter" style="border-color:#0d7c66;color:#0d7c66;">🏥 Encounters</button><button class="fbtn" data-filter="condition" style="border-color:#c49a0a;color:#c49a0a;">🩺 Conditions</button><button class="fbtn" data-filter="observation" style="border-color:#264653;color:#264653;">📋 Observations</button><button class="fbtn" data-filter="medication" style="border-color:#e76f51;color:#e76f51;">💊 Medications</button>
+  </div>
+
+  <div class="tl-wrap" id="tl">
+    
+<div class="year-marker">2023</div>
+<div class="evt evt-left" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">Patient encounter procedure (procedure)</div>
+    <div class="card-meta">Jul 02, 2023  08:34 <span class="dur">⏱ 55 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+<div class="year-marker">2024</div>
+<div class="evt evt-right" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">General examination of patient (procedure)</div>
+    <div class="card-meta">Apr 14, 2024  08:34 <span class="dur">⏱ 40 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+
+<div class="evt evt-left" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">Consultation for treatment (procedure)</div>
+    <div class="card-meta">May 23, 2024  21:41 <span class="dur">⏱ 15 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+
+<div class="evt evt-right" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">Encounter for symptom (procedure)</div>
+    <div class="card-meta">May 26, 2024  10:34 <span class="dur">⏱ 15 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+
+<div class="evt evt-left" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">Patient encounter procedure (procedure)</div>
+    <div class="card-meta">May 27, 2024  03:41 <span class="dur">⏱ 1h 7m</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+<div class="year-marker">2025</div>
+<div class="evt evt-right" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">General examination of patient (procedure)</div>
+    <div class="card-meta">Apr 20, 2025  08:34 <span class="dur">⏱ 48 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+
+<div class="evt evt-left" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">Consultation for treatment (procedure)</div>
+    <div class="card-meta">May 22, 2025  04:48 <span class="dur">⏱ 15 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+
+<div class="year-marker">2026</div>
+<div class="evt evt-right" data-type="encounter">
+  <div class="dot" style="background:#0d7c66;">🏥</div>
+  <div class="card" style="border-left:4px solid #0d7c66;">
+    <div class="card-type" style="color:#0d7c66;">ENCOUNTER</div>
+    <div class="card-label">General examination of patient (procedure)</div>
+    <div class="card-meta">Apr 26, 2026  08:34 <span class="dur">⏱ 33 min</span></div>
+    <div class="card-detail">Class: AMB  Status: finished</div>
+  </div>
+</div>
+    <div class="no-events" id="noevt">No events match this filter.</div>
+  </div>
+
+  <script>
+    const btns = document.querySelectorAll('.fbtn');
+    const evts = document.querySelectorAll('.evt');
+    const noEvt = document.getElementById('noevt');
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        let visible = 0;
+        evts.forEach(e => {
+          const match = f === 'all' || e.dataset.type === f;
+          e.classList.toggle('hidden', !match);
+          if (match) visible++;
+        });
+        noEvt.style.display = visible === 0 ? 'block' : 'none';
+      });
+    });
+
+    // Activate "All" by default
+    document.querySelector('.fbtn[data-filter="all"]').click();
+  </script>
+</body>
+</html>
