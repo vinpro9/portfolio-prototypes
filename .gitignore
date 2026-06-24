@@ -1,0 +1,26 @@
+# Dependencies
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+
+# Generated state — do not commit, varies per run environment
+watermark.json
+
+# Generated data outputs — large and regeneratable
+patients.csv
+observations.csv
+conditions.csv
+medication_requests.csv
+encounters.csv
+patient_activity_summary.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
